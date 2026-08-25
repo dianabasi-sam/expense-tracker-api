@@ -30,14 +30,15 @@ expensesRouter.get("/", (req, res) => {
 
 
 expensesRouter.post("/", (req, res)=>{
-    const {category, amount, date} = req.body || {};
+    const {category, description, amount, date} = req.body || {};
 
-    if (!category || !amount || !date){
+    if (!category || !description || !amount || !date){
       return res.status(400).json({ error: "Missing required fields" });
     } else {
         const newExpense = {
             id: expenses.length + 1,
             category: category,
+            description: description,
             amount: amount,
             date: date
         };
@@ -47,12 +48,14 @@ expensesRouter.post("/", (req, res)=>{
 });
 
 expensesRouter.patch("/:id", (req, res)=>{
-    const {category, amount, date} = req.body || {};
+    console.log("PATCH REQUEST BODY:", req.body);
+    const {category, description, amount, date} = req.body || {};
     const expense = expenses.find((e) => e.id === parseInt(req.params.id));
     if (!expense) {
         return res.status(404).json({ error: "Expense not found" });
     } else {
         if (category) expense.category = category;
+        if (description) expense.description = description;
         if (amount) expense.amount = amount;
         if (date) expense.date = date;
         res.json(expense);

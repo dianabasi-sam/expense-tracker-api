@@ -1,16 +1,33 @@
 # Expense Tracker API
 
-A simple REST API for managing expenses, built with Node.js and Express.
+A full-stack expense tracking application built with Node.js, Express, HTML, CSS and Javascript.
 
 ## Features
-- Users can add expenses with a category, amount, and date.
+
+### Expense Management
+- Users can add new expenses with a category, amount, and date.
 - Users can retrieve their expenses.
 - Users can filter expenses by category, amount, or date.
 - Users can update existing expenses.
 - Users can delete existing expenses.
 
+### Filtering and Sorting
+- Users can search expenses by category.
+- Users can filter expenses by category.
+- Users can view custom categories under "others".
+- Users can sort expenses by newest, oldest, highest amount, or lowest amount.
+- Users can view the three most recent expenses, with an option to view all expenses.
+
+### Frontend
+- Responsive user interface.
+- Dynamic rendering of expenses.
+- Expense summary showing total expenses and expense count.
+- Mobile friendly layout.
+
 ## Technologies Used
 - Javascript
+- HTML5
+- CSS3
 - Node.js
 - Express.js
 - Postman (for API testing)

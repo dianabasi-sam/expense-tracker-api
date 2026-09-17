@@ -7,7 +7,12 @@ const totalExpensesElement = document.getElementById("total-expenses");
 const expenseCountElement = document.getElementById("expense-count");
 
 const viewAllButton = document.getElementById("view-all");
+const logoutButton = document.getElementById("logout-button");
 
+logoutButton.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "./login.html";
+});
 
 let allExpenses = [];
 let showAllExpenses = false;
@@ -94,8 +99,17 @@ function displayExpense(expense) {
     deleteButton.classList.add("delete-button");
     
     deleteButton.addEventListener("click", () => {
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.error("No token found. Please log in.");
+            return;
+        }
         fetch(`http://localhost:3000/expenses/${expense.id}`, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
         })
         .then(response => {
             if (response.ok) {
@@ -104,7 +118,11 @@ function displayExpense(expense) {
             } else {
                 console.error("Failed to delete expense");
             }
-        })});
+        })
+        .catch(error => {
+            console.error("Error deleting expense:", error);
+        });
+    });
 
     actions.appendChild(editButton);
     actions.appendChild(deleteButton);
@@ -132,13 +150,12 @@ function renderExpenses() {
         filteredExpenses.sort((expenseA, expenseB)=>
         new Date(expenseB.date) - new Date(expenseA.date));
 
-        filteredExpenses=filteredExpenses.slice(0, 3);
     }
 
     const selectedCategory = categoryFilter.value;
 
-if (selectedCategory !== "all") {
-    if (selectedCategory === "others") {
+    if (selectedCategory !== "all") {
+        if (selectedCategory === "others") {
         const predefinedCategories = [
             "food",
             "transport",
@@ -184,6 +201,10 @@ if (selectedCategory !== "all") {
         filteredExpenses.sort((expenseA, expenseB) => new Date(expenseA.date) - new Date(expenseB.date));
     }
 
+    if(!showAllExpenses && searchInput.value.trim() === "" && categoryFilter.value === "all"){
+        filteredExpenses = filteredExpenses.slice(0,3)
+    }
+
     expenseList.innerHTML = "";
     if (filteredExpenses.length === 0) {
         displayNoExpensesMessage();
@@ -196,7 +217,17 @@ if (selectedCategory !== "all") {
 function loadExpenses() {
     expenseList.innerHTML = "";
 
-    fetch("http://localhost:3000/expenses")
+    const token = localStorage.getItem("token");
+    if (!token) {
+        console.error("No token found. Please log in.");
+        return;
+    }
+
+    fetch("http://localhost:3000/expenses", {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
         .then(response => response.json())
         .then(expenses => {
             allExpenses = expenses;
@@ -247,10 +278,16 @@ expenseForm.addEventListener("submit", (e) => {
             amount: amount,
             date: date
         });
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.error("No token found. Please log in.");
+            return;
+        }
         fetch(`http://localhost:3000/expenses/${editingExpenseId}`, {
             method: "PATCH",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({ category, description, amount, date })
         })
@@ -267,11 +304,17 @@ expenseForm.addEventListener("submit", (e) => {
         });
     } else {
         // Add new expense
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.error("No token found. Please log in.");
+            return;
+        }
         fetch("http://localhost:3000/expenses", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
-        },
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
         body: JSON.stringify({ category, description, amount, date })
     })
     .then(response => response.json())
